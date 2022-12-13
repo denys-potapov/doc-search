@@ -1,7 +1,7 @@
 """DB related."""
 import databases
 
-DATABASE_URL = "postgresql://postgres:1@localhost/documents"
+DATABASE_URL = "postgresql://postgres:11@localhost/documents"
 
 database = databases.Database(DATABASE_URL)
 
