@@ -11,6 +11,7 @@ Preview should be available at http://167.99.253.189:8000/docs
 
 ### Prepare the DB
 
+    sudo -u postgres psql -c 'create database documents;'
     psql -d documents -h localhost -U postgres < sql/schema.sql
 
 ### Start
