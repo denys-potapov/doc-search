@@ -33,6 +33,11 @@ async def get_document(
     return await db.get_document(document_id)
 
 
+@app.get("/search")
+async def search(query: str):
+    return await db.search_documents(query)
+
+
 @app.post("/documents/")
 async def create_document(
         background_tasks: BackgroundTasks,

@@ -34,3 +34,15 @@ async def update_document_text(id, text):
         "status": "OK"
     }
     return await database.execute(query=query, values=values)
+
+
+async def search_documents(plain_query):
+    """Search documents."""
+    query = """
+        SELECT id
+        FROM documents
+        WHERE
+            ts @@ plainto_tsquery('simple', :plain_query)"""
+
+    return await database.fetch_all(
+        query=query, values={"plain_query": plain_query})
