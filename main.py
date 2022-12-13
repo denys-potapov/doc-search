@@ -6,6 +6,7 @@ from fastapi.concurrency import run_in_threadpool
 
 from ocr import get_text
 import db
+import models
 
 
 app = FastAPI()
@@ -27,18 +28,18 @@ async def process_document(document_id, stream: bytes):
     await db.update_document_text(document_id, text)
 
 
-@app.get("/documents/{document_id}")
+@app.get("/documents/{document_id}", response_model=models.Document)
 async def get_document(
         document_id: UUID):
     return await db.get_document(document_id)
 
 
-@app.get("/search")
+@app.get("/search", response_model=list[models.Document])
 async def search(query: str):
     return await db.search_documents(query)
 
 
-@app.post("/documents/")
+@app.post("/documents/", response_model=models.Document)
 async def create_document(
         background_tasks: BackgroundTasks,
         file: bytes = File()):
