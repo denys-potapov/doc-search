@@ -18,16 +18,16 @@ Preview should be available at http://167.99.253.189:8000/docs
 
     TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata/ uvicorn main:app --reload --host 0.0.0.0
 
-    TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata/ uvicorn main:app --workers 4
+    TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata/ uvicorn main:app --workers 4 --port 40111
 
 ## Endpoints
 
-View the interactive docs http://localhost:8000/docs
+View the interactive docs http://localhost:40111/docs
 
 ### Add document
 
     curl -X 'POST' \
-      'http://localhost:8000/documents/' \
+      'http://localhost:40111/documents/' \
       -H 'accept: application/json' \
       -H 'Content-Type: multipart/form-data' \
       -F 'file=@sample2.pdf;type=application/pdf'
@@ -43,7 +43,7 @@ Response body:
 ### Search documents
 
     curl -X 'GET' \
-      'http://localhost:8000/search?query=%D0%BF%D0%B0%D0%BF%D0%B5%D1%80%D0%BE%D0%B2%D0%B8%D1%85%20%D0%B4%D0%BE%D0%BA%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D1%96%D0%B2' \
+      'http://localhost:40111/search?query=%D0%BF%D0%B0%D0%BF%D0%B5%D1%80%D0%BE%D0%B2%D0%B8%D1%85%20%D0%B4%D0%BE%D0%BA%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D1%96%D0%B2' \
       -H 'accept: application/json'
 
 Response body:
