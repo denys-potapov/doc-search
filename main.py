@@ -3,6 +3,7 @@ from uuid import UUID
 
 from fastapi import FastAPI, File, BackgroundTasks
 from fastapi.concurrency import run_in_threadpool
+from fastapi.openapi.utils import get_openapi
 
 from ocr import get_text
 import db
@@ -10,6 +11,20 @@ import models
 
 
 app = FastAPI()
+
+
+def openapi_schema():
+   schema = get_openapi(
+       title="Document search",
+       version="0.1",
+       description="Search documents from any forrmat",
+       routes=app.routes,
+   )
+   app.openapi_schema = schema
+   return app.openapi_schema
+
+
+app.openapi = openapi_schema
 
 
 @app.on_event("startup")

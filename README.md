@@ -1,5 +1,7 @@
 # doc-search
 
+Preview should be available at http://167.99.253.189:8000/docs
+
 ## Local run
 
 ### Install requirments
@@ -13,7 +15,9 @@
 
 ### Start
 
-    psql -d documents -h localhost -U postgres < sql/schema.sql
+    TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata/ uvicorn main:app --reload --host 0.0.0.0
+
+    TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata/ uvicorn main:app --workers 4
 
 ## Endpoints
 
@@ -55,3 +59,14 @@ Response body:
         "text": "..."
       }
     ]
+
+
+## Deploy
+
+    sudo systemctl start postgresql.service
+
+To log in without a password:
+
+    sudo -u postgres psql postgres
+    ALTER USER postgres WITH PASSWORD '11';
+
