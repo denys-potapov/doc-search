@@ -39,7 +39,7 @@ async def update_document_text(id, text):
 async def search_documents(plain_query):
     """Search documents."""
     query = """
-        SELECT id
+        SELECT *
         FROM documents
         WHERE
             ts @@ plainto_tsquery('simple', :plain_query)"""
