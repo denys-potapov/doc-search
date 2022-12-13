@@ -6,7 +6,7 @@ Preview should be available at http://167.99.253.189:8000/docs
 
 ### Install requirments
 
-    sudo apt-get install postgresql tesseract-ocr tesseract-ocr-all
+    sudo apt-get install postgresql tesseract-ocr tesseract-ocr-all python3-pip
     pip3 install -r requirments.txt
 
 ### Prepare the DB
