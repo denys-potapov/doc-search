@@ -2,7 +2,7 @@
 import sys
 import os
 
-import fitz 
+import fitz
 
 
 LANG = 'ukr+eng'

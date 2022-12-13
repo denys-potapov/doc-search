@@ -12,7 +12,25 @@ async def get_document(id):
     return await database.fetch_one(query=query, values={"id": id})
 
 
-async def create_document():
+async def create_empty_document():
     """Create new document."""
-    query = "INSERT INTO documents DEFAULT VALUES RETURNING id, status"
+    query = "INSERT INTO documents DEFAULT VALUES RETURNING *"
     return await database.fetch_one(query=query)
+
+
+async def update_document_text(id, text):
+    """Update document text and status."""
+    query = """
+        UPDATE documents
+        SET
+            text = :text,
+            status = :status
+        WHERE
+            id = :id
+    """
+    values = {
+        "id": id,
+        "text": text,
+        "status": "OK"
+    }
+    return await database.execute(query=query, values=values)
