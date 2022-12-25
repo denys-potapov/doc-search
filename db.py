@@ -1,4 +1,6 @@
 """DB related."""
+import re
+
 import databases
 
 DATABASE_URL = "postgresql://postgres:1@localhost/documents"
@@ -34,6 +36,13 @@ async def update_document_text(id, text):
         "status": "OK"
     }
     return await database.execute(query=query, values=values)
+
+
+def plainto_tsquery(query):
+    """Convert plain query to tsquery input.
+    Supports ! (not) and * (prefix) modifiers."""
+    words = re.findall(r'!?\w+\*?', query)
+    return " & ".join(words).replace('*', ':*')
 
 
 async def search_documents(plain_query):
