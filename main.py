@@ -14,14 +14,14 @@ app = FastAPI()
 
 
 def openapi_schema():
-   schema = get_openapi(
-       title="Document search",
-       version="0.1",
-       description="Search documents from any forrmat",
-       routes=app.routes,
-   )
-   app.openapi_schema = schema
-   return app.openapi_schema
+    schema = get_openapi(
+        title="Document search",
+        version="0.1",
+        description="Search documents from any forrmat",
+        routes=app.routes,
+    )
+    app.openapi_schema = schema
+    return app.openapi_schema
 
 
 app.openapi = openapi_schema
