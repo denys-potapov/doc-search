@@ -2,36 +2,15 @@
 
 Preview should be available at http://167.99.253.189:8000/docs
 
-## Local run
+### Search patterns
 
-### Install requirments
+1. *Exclude:* `!KAMAZ` - exclude documents that contain `!KAMAZ`
+2. *Prefix match:* `55*` - search documents that contain words starting from `55`.
 
-    sudo apt-get install postgresql tesseract-ocr tesseract-ocr-all
-    pip3 install -r requirments.txt
+### Supported formats
 
-### Prepare the DB
-
-    psql -d documents -h localhost -U postgres < sql/schema.sql
-
-#### Install ukrainian support
-
-Download two parts of dictionary and add them to postgress:
-
-    wget https://github.com/brown-uk/dict_uk/releases/download/v5.9.0/hunspell-uk_UA_5.9.0.zip
-    unzip hunspell-uk_UA_5.9.0.zip
-    sudo cp uk_UA.aff `pg_config --sharedir`/tsearch_data/uk_UA.affix
-    sudo cp uk_UA.dic `pg_config --sharedir`/tsearch_data/uk_UA.dict
-
-    wget https://raw.githubusercontent.com/brown-uk/dict_uk/v5.9.0/distr/postgresql/ukrainian.stop
-    sudo cp ukrainian.stop `pg_config --sharedir`/tsearch_data/ukrainian.stop
-
-    psql -h localhost -U postgres < sql/uk_ua_search.sql
-
-### Start
-
-    TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata/ uvicorn main:app --reload --host 0.0.0.0
-
-    TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata/ uvicorn main:app --workers 4 --host 0.0.0.0
+1. Scanned PDF
+2. Text PDF
 
 ## Endpoints
 
@@ -75,23 +54,33 @@ Response body:
     ]
 
 
-## Deploy
+## Local run
 
-    sudo systemctl start postgresql.service
+### Install requirments
 
-To log in without a password:
+    sudo apt-get install postgresql tesseract-ocr tesseract-ocr-all
+    pip3 install -r requirments.txt
 
-    sudo -u postgres psql postgres
-    ALTER USER postgres WITH PASSWORD '11';
+### Prepare the DB
 
-### tmux
+    psql -d documents -h localhost -U postgres < sql/schema.sql
 
-    tmux
+#### Install ukrainian support
 
-Detach:
+Download two parts of dictionary and add them to postgress:
 
-     Ctrl+b and then d
-   
-Attach:
+    wget https://github.com/brown-uk/dict_uk/releases/download/v5.9.0/hunspell-uk_UA_5.9.0.zip
+    unzip hunspell-uk_UA_5.9.0.zip
+    sudo cp uk_UA.aff `pg_config --sharedir`/tsearch_data/uk_UA.affix
+    sudo cp uk_UA.dic `pg_config --sharedir`/tsearch_data/uk_UA.dict
 
-    tmux attach
+    wget https://raw.githubusercontent.com/brown-uk/dict_uk/v5.9.0/distr/postgresql/ukrainian.stop
+    sudo cp ukrainian.stop `pg_config --sharedir`/tsearch_data/ukrainian.stop
+
+    psql -h localhost -U postgres < sql/uk_ua_search.sql
+
+### Start
+
+    TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata/ uvicorn main:app --reload --host 0.0.0.0
+
+    TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata/ uvicorn main:app --workers 4 --host 0.0.0.0

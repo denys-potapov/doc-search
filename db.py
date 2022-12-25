@@ -3,7 +3,9 @@ import re
 
 import databases
 
-DATABASE_URL = "postgresql://postgres:1@localhost/documents"
+SEARCH_CONFIG = 'ukrainian'
+
+DATABASE_URL = 'postgresql://postgres:1@localhost/documents'
 
 database = databases.Database(DATABASE_URL)
 
@@ -45,13 +47,17 @@ def plainto_tsquery(query):
     return " & ".join(words).replace('*', ':*')
 
 
-async def search_documents(plain_query):
+async def search_documents(plain_query, limit=50, offset=0):
     """Search documents."""
     query = """
-        SELECT *
-        FROM documents
-        WHERE
-            ts @@ plainto_tsquery('simple', :plain_query)"""
+        SELECT id, status, text, ts_rank_cd(ts, query) AS rank
+        FROM documents, to_tsquery(:search_config, :ts_query) query
+        WHERE query @@ ts
+        ORDER BY rank DESC
+        LIMIT :limit OFFSET :offset;"""
 
-    return await database.fetch_all(
-        query=query, values={"plain_query": plain_query})
+    return await database.fetch_all(query=query, values={
+        "search_config": SEARCH_CONFIG,
+        "ts_query": plainto_tsquery(plain_query),
+        "limit": limit,
+        "offset": offset})
