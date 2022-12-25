@@ -4,7 +4,7 @@ Preview should be available at http://167.99.253.189:8000/docs
 
 ### Search patterns
 
-1. *Exclude:* `!KAMAZ` - exclude documents that contain `!KAMAZ`
+1. *Stop words:* `!KAMAZ` - exclude documents that contain `!KAMAZ`
 2. *Prefix match:* `55*` - search documents that contain words starting from `55`.
 
 ### Supported formats

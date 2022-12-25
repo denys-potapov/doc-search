@@ -49,9 +49,9 @@ async def get_document(
     return await db.get_document(document_id)
 
 
-@app.get("/search", response_model=list[models.Document])
-async def search(query: str):
-    return await db.search_documents(query)
+@app.get("/search", response_model=list[models.RankedDocument])
+async def search(query: str, limit: int = 50, offset: int = 0):
+    return await db.search_documents(query, limit, offset)
 
 
 @app.post("/documents/", response_model=models.Document)

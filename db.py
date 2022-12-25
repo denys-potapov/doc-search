@@ -47,7 +47,7 @@ def plainto_tsquery(query):
     return " & ".join(words).replace('*', ':*')
 
 
-async def search_documents(plain_query, limit=50, offset=0):
+async def search_documents(plain_query, limit, offset):
     """Search documents."""
     query = """
         SELECT id, status, text, ts_rank_cd(ts, query) AS rank
