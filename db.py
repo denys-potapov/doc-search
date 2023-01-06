@@ -1,7 +1,7 @@
 """DB related."""
 import re
 
-from sqlalchemy import text, bindparam, String
+from sqlalchemy import text, bindparam, String, Float
 from sqlalchemy.dialects.postgresql import JSONB
 
 import databases
@@ -17,7 +17,7 @@ async def get_document(id):
     """Get document by id."""
     query = text(
         "SELECT id, status, meta FROM documents WHERE id = :id"
-        ).bindparams(id=id).columns(id=String, status=String, meta=JSONB)
+    ).bindparams(id=id).columns(id=String, status=String, meta=JSONB)
 
     return await database.fetch_one(query=query)
 
@@ -33,22 +33,28 @@ async def create_document(meta):
     return await database.fetch_one(query=query)
 
 
-async def update_document_text(id, text):
+async def update_document_text(document_id, pages: list):
     """Update document text and status."""
-    query = """
-        UPDATE documents
-        SET
-            text = :text,
-            status = :status
-        WHERE
-            id = :id
-    """
-    values = {
-        "id": id,
-        "text": text,
-        "status": "OK"
-    }
-    return await database.execute(query=query, values=values)
+    async with database.transaction():
+        await database.execute_many(
+            query="""INSERT INTO pages (document_id, number, text)
+                VALUES (:document_id, :number, :text)""",
+            values=[{
+                "document_id": document_id,
+                "number": number,
+                "text": text
+            } for number, text in enumerate(pages, start=1)]
+        )
+    await database.execute(
+            query="""UPDATE documents
+                SET text = :text, status = :status
+                WHERE id = :id""",
+            values={
+                "id": document_id,
+                "text": "\n".join(pages),
+                "status": "OK"
+            }
+        )
 
 
 def plainto_tsquery(query):
@@ -60,15 +66,37 @@ def plainto_tsquery(query):
 
 async def search_documents(plain_query, limit, offset):
     """Search documents."""
-    query = """
-        SELECT id, status, text, ts_rank_cd(ts, query) AS rank
-        FROM documents, to_tsquery(:search_config, :ts_query) query
-        WHERE query @@ ts
+    query = text("""
+        SELECT id, status, meta,
+               ts_headline(:search_config, text, query) AS headline,
+               ts_rank_cd(ts, query) AS rank
+        FROM   documents, to_tsquery(:search_config, :ts_query) query
+        WHERE  query @@ ts
         ORDER BY rank DESC
-        LIMIT :limit OFFSET :offset;"""
+        LIMIT :limit OFFSET :offset;""").bindparams(
+            search_config=SEARCH_CONFIG,
+            ts_query=plainto_tsquery(plain_query),
+            limit=limit,
+            offset=offset
+        ).columns(
+            id=String, status=String, meta=JSONB, headline=String, rank=Float)
 
-    return await database.fetch_all(query=query, values={
-        "search_config": SEARCH_CONFIG,
-        "ts_query": plainto_tsquery(plain_query),
-        "limit": limit,
-        "offset": offset})
+    return await database.fetch_all(query=query)
+
+
+async def highlight_document(document_id, plain_query):
+    """Highlights pages in document."""
+    return await database.fetch_all(
+        query="""
+            SELECT number as page_number,
+                   ts_headline(:search_config, text, query) AS headline
+            FROM   pages, to_tsquery(:search_config, :ts_query) query
+            WHERE  to_tsvector(:search_config, text) @@ query AND
+                   document_id = :document_id
+            ORDER BY number""",
+        values={
+            "search_config": SEARCH_CONFIG,
+            "document_id": document_id,
+            "ts_query": plainto_tsquery(plain_query)
+        }
+    )
