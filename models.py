@@ -6,8 +6,8 @@ from pydantic import BaseModel
 
 class Document(BaseModel):
     id: UUID
-    status: str = "PENDING"
-    text: str = ''
+    status: str = 'PENDING'
+    meta: dict
 
 
 class RankedDocument(Document):

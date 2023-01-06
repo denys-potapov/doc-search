@@ -9,6 +9,7 @@ from ocr import get_text
 import db
 import models
 
+from pydantic import Json
 
 app = FastAPI()
 
@@ -57,8 +58,8 @@ async def search(query: str, limit: int = 50, offset: int = 0):
 @app.post("/documents/", response_model=models.Document)
 async def create_document(
         background_tasks: BackgroundTasks,
-        file: bytes = File()):
-    document = await db.create_empty_document()
+        meta: Json, file: bytes = File()):
+    document = await db.create_document(meta)
     background_tasks.add_task(process_document, document["id"], file)
 
     return document

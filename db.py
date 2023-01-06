@@ -1,6 +1,9 @@
 """DB related."""
 import re
 
+from sqlalchemy import text, bindparam, String
+from sqlalchemy.dialects.postgresql import JSONB
+
 import databases
 
 SEARCH_CONFIG = 'ukrainian'
@@ -12,13 +15,21 @@ database = databases.Database(DATABASE_URL)
 
 async def get_document(id):
     """Get document by id."""
-    query = "SELECT * FROM documents WHERE id = :id"
-    return await database.fetch_one(query=query, values={"id": id})
+    query = text(
+        "SELECT id, status, meta FROM documents WHERE id = :id"
+        ).bindparams(id=id).columns(id=String, status=String, meta=JSONB)
+
+    return await database.fetch_one(query=query)
 
 
-async def create_empty_document():
+async def create_document(meta):
     """Create new document."""
-    query = "INSERT INTO documents DEFAULT VALUES RETURNING *"
+    query = text(
+        """INSERT INTO documents (meta) VALUES (:meta)
+        RETURNING id, status, meta""").bindparams(
+        bindparam('meta', value=meta, type_=JSONB)).columns(
+        id=String, status=String, meta=JSONB)
+
     return await database.fetch_one(query=query)
 
 
