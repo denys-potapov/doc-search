@@ -19,17 +19,19 @@ View the interactive docs http://localhost:8000/docs
 ### Add document
 
     curl -X 'POST' \
-      'http://localhost:8000/documents/' \
+      'http://localhost:8000/documents/?meta=%7B%22color%22%3A%20%22true%22%7D' \
       -H 'accept: application/json' \
       -H 'Content-Type: multipart/form-data' \
-      -F 'file=@sample2.pdf;type=application/pdf'
+      -F 'file=@sample.color.pdf;type=application/pdf'
 
 Response body:
 
     {
       "id": "8070eba4-cc5b-4ba0-8a5e-9f290ef7c7ea",
       "status": "PENDING",
-      "text": ""
+      "meta": {
+        "color": "true"
+      }
     }
 
 ### Search documents
@@ -44,15 +46,35 @@ Response body:
       {
         "id": "1c71246b-1ac4-43fb-b5d7-634aa65e6ad4",
         "status": "OK",
-        "text": "..."
+        "meta": {
+          "color": "true"
+        }
+        "headline": "..."
       },
       {
         "id": "8070eba4-cc5b-4ba0-8a5e-9f290ef7c7ea",
         "status": "OK",
-        "text": "..."
+        "meta": {
+          "color": "true"
+        }
+        "headline": "..."
       }
     ]
 
+### Highlight pages in document
+
+    curl -X 'GET' \
+      'http://localhost:8000/documents/ea2d3679-de61-4892-b3aa-f62c3a6f68c6/highlights?query=opel%20WOLF%2A' \
+      -H 'accept: application/json'
+
+Response body:
+
+    [
+      {
+        "page_number": 2,
+        "headline": "<b>Opel</b> ; Модель: Vivaro;...."
+      }
+    ]
 
 ## Local run
 
